@@ -15,13 +15,13 @@ public class TimeWheel {
     /** 时间轮大小 */
     private int wheelSize;
 
-    /** 时间跨度 */
+    /** 时间跨度 interaval = tickMs * wheelSize */
     private long interval;
 
     /** 槽 */
     private Bucket[] buckets;
 
-    /** 时间轮指针 */
+    /** 时间轮指针 currentTimestamp = currentTimestamp - (currentTimestamp % tickMs) */
     private long currentTimestamp;
 
     /** 上层时间轮 */
@@ -60,8 +60,11 @@ public class TimeWheel {
      */
     public boolean addTask(TimedTask timedTask) {
         long expireTimestamp = timedTask.getExpireTimestamp();
+        // delay time
         long delayMs = expireTimestamp - currentTimestamp;
-        if (delayMs < tickMs) {// 到期了
+        // expired
+        // 到期了
+        if (delayMs < tickMs) {
             return false;
         } else {
 
@@ -71,11 +74,13 @@ public class TimeWheel {
 
                 Bucket bucket = buckets[bucketIndex];
                 bucket.addTask(timedTask);
+                // 保证过期时间必须是 tickMs的整数倍
                 if (bucket.setExpire(delayMs + currentTimestamp - (delayMs + currentTimestamp) % tickMs)) {
                     delayQueue.offer(bucket);
                 }
             } else {
-                TimeWheel timeWheel = getOverflowWheel();// 当maybeInThisBucket大于等于wheelSize时，需要将它扔到上一层的时间轮
+                // 当maybeInThisBucket大于等于wheelSize时，需要将它扔到上一层的时间轮
+                TimeWheel timeWheel = getOverflowWheel();
                 timeWheel.addTask(timedTask);
             }
         }

@@ -20,6 +20,7 @@ public class Timer {
     private TimeWheel timeWheel;
 
     /** 对于一个Timer以及附属的时间轮，都只有一个delayQueue */
+    /** 此delayQueue 需要传递到 timeWheel中的，是同一个 delayQueue **/
     private DelayQueue<Bucket> delayQueue = new DelayQueue<>();
 
     /** 只有一个线程的无限阻塞队列线程池 */

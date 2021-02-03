@@ -9,14 +9,14 @@ import java.util.function.Consumer;
 /**
  * Created by Anur IjuoKaruKas on 2018/10/16
  *
- * 槽、或者说桶
+ * 槽、或者说桶, 继承 delayed 接口
  */
 public class Bucket implements Delayed {
 
     /** 当前槽的过期时间 */
     private AtomicLong expiration = new AtomicLong(-1L);
 
-    /** 根节点 */
+    /** 根节点, 哨兵节点 */
     private TimedTask root = new TimedTask(-1L, null);
 
     {
@@ -40,6 +40,7 @@ public class Bucket implements Delayed {
 
     /**
      * 新增任务到bucket
+     * 头插法，双链表
      */
     public void addTask(TimedTask timedTask) {
         synchronized (timedTask) {
@@ -73,9 +74,11 @@ public class Bucket implements Delayed {
 
     /**
      * 重新分配槽
+     * 此处的consumer 是 addTask
      */
     public synchronized void flush(Consumer<TimedTask> flush) {
-        TimedTask timedTask = root.next;// 从尾巴开始（最先加进去的）
+        // 从尾巴开始（最先加进去的）
+        TimedTask timedTask = root.next;
 
         while (!timedTask.equals(root)) {
             this.removeTask(timedTask);
@@ -85,6 +88,11 @@ public class Bucket implements Delayed {
         expiration.set(-1L);
     }
 
+    /**
+     * unit.convert
+     * @param unit
+     * @return
+     */
     @Override
     public long getDelay(TimeUnit unit) {
         return Math.max(0, unit.convert(expiration.get() - System.currentTimeMillis(), TimeUnit.MILLISECONDS));

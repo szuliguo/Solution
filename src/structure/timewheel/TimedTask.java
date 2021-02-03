@@ -21,10 +21,13 @@ public class TimedTask {
     /** 是否取消 */
     private volatile boolean cancle;
 
+    //bucket:桶
     protected Bucket bucket;
 
+    //下一个 timedTask
     protected TimedTask next;
 
+    //上一个 timedTask
     protected TimedTask pre;
 
     public String desc;
