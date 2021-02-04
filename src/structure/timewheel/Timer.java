@@ -91,8 +91,10 @@ public class Timer {
 
     public static void main(String[] args) {
 
+        //初始化 timer
         getInstance();
 
+        //添加延时任务
         for (int i = 0; i < 1000; i++) {
             final int flag = i;
             TimedTask task = new TimedTask(i * 2000, new Runnable() {
@@ -106,6 +108,7 @@ public class Timer {
 
         }
 
+        //主线程等待
         try {
             Thread.sleep(1000 * 60 * 10);
         } catch (InterruptedException e) {
