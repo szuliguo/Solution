@@ -57,7 +57,7 @@ public class Timer {
 
         bossThreadPool.execute(() -> {
             while (true) {
-                INSTANCE.advanceClock(20);
+                advanceClock(20);
             }
         });
     }
@@ -86,5 +86,31 @@ public class Timer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    public static void main(String[] args) {
+
+        getInstance();
+
+        for (int i = 0; i < 1000; i++) {
+            final int flag = i;
+            TimedTask task = new TimedTask(i * 2000, new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("task" + flag);
+                }
+            });
+
+            INSTANCE.addTask(task);
+
+        }
+
+        try {
+            Thread.sleep(1000 * 60 * 10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }
